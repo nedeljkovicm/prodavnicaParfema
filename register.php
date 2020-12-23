@@ -1,0 +1,71 @@
+<html>
+  <head>
+    <title> Registracija</title>
+    <link href='https://fonts.googleapis.com/css?family=Merienda' rel='stylesheet'>
+	 <link href='https://fonts.googleapis.com/css?family=Arima Madurai' rel='stylesheet'>
+    <link href="stilovi3.css" rel="stylesheet" type="text/css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />  
+           <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>  
+
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <header>
+    <h2>Registracija</h2>
+  </header>
+     <section id ="showcase">
+
+ <div class="container">
+   <img src = "slike/9.8.jpg" style="float: right; margin-top:60px; width: 50%; height:80%; margin-right: 1%; margin-bottom:20px ; border-radius: 25px;">
+   <br><br>
+  <div class="form1"> 
+    
+    <form action="register.php" method="post">
+      <br><br>
+      Ime i prezime: <br/> <br> <input type="text" name="name" required="required"/> <br/> <br>
+      E-mail:  <br/> <br>  <input type="text" name="email" required="required" reqired pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"> <br/> <br>
+      Korisničko ime: <br/> <br> <input type="text" name="username" required="required"/> <br/> <br>
+      Šifra: <br/> <br> <input type="password" name="password" required="required" /> <br/><br><br>
+      <input type="submit" value="Registracija"/><br> <br>
+       <input type="reset" value="Poništi"/>
+       <br><br><br>
+      <a href="index.php"> <-NAZAD NA POČETNU </a><br/><br/>
+    </form>
+   </div>
+  </div>
+</section>
+
+<?php
+
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+  session_start(); 
+include "konekcija.php";
+  $username = mysqli_real_escape_string($mysqli,$_POST['username']);
+  $password = mysqli_real_escape_string($mysqli,$_POST['password']);
+  $imeiprezime= mysqli_real_escape_string($mysqli,$_POST['name']);
+  $email= mysqli_real_escape_string($mysqli,$_POST['email']);
+    $bool = true;
+
+  $query = mysqli_query($mysqli,"Select * from korisnik"); //Query the users table
+  while($row = mysqli_fetch_array($mysqli,$query)) //display all rows from query
+  {
+    $table_users = $row['username']; // the first username row is passed on to $table_users, and so on until the query is finished
+    if($username == $table_users) // checks if there are any matching fields
+    {
+      $bool = false; // sets bool to false
+      Print '<script>alert("Username has been taken!");</script>'; //Prompts the user
+      Print '<script>window.location.assign("register.php");</script>'; // redirects to register.php
+    }
+  }
+  if($bool) // checks if bool is true
+  {
+    mysqli_query($mysqli,"INSERT INTO korisnik (imeiprezime,email,username, password) VALUES ('$imeiprezime','$email','$username','$password')"); //Inserts the value to table users
+    Print '<script>alert("Successfully Registered!");</script>'; // Prompts the user
+   $_SESSION['user'] = $username; //set the username in a session. This serves as a global variable
+          header("location: home.php");// redirects the user to the authenticated home page
+  }
+}
+?>
+ </body>
+</html>
